@@ -111,9 +111,7 @@ WORKDIR $NGINX_PREFIX/
 ONBUILD RUN rm -rf conf/* html/*
 ONBUILD COPY nginx $NGINX_PREFIX/
 
-COPY ./http*.lua /opt/openresty/lualib/resty/
 RUN  mkdir -p /etc/nginx/ssl && echo '<?php if(isset($_REQUEST["printinfo"])) phpinfo();' > /var/www/html/index.php
-ADD  ./uuid.lua /opt/openresty/lualib/resty/uuid.lua
 ADD  ./start.sh /start.sh
 
 EXPOSE 80 443 9000
