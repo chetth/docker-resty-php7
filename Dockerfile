@@ -1,4 +1,4 @@
-FROM php:7-fpm-alpine
+FROM php:fpm-alpine
 
 #### PHP7 extensions ##############################
 RUN apk add --update --no-cache --virtual .ext-deps \
@@ -21,8 +21,7 @@ RUN \
     --with-jpeg-dir=/usr/include --with-png-dir=/usr/include \
     --with-webp-dir=/usr/include --with-freetype-dir=/usr/include && \
     docker-php-ext-configure sockets && \
-    docker-php-ext-configure mcrypt && \
-    docker-php-ext-install pdo_mysql opcache exif gd sockets mcrypt mysqli
+    docker-php-ext-install pdo_mysql opcache exif gd sockets mysqli
 
 RUN \
     pecl install redis && \
@@ -35,7 +34,7 @@ RUN \
     docker-php-source delete
 
 ####  Setup OpenResty ###################
-ENV OPENRESTY_VERSION 1.11.2.5
+ENV OPENRESTY_VERSION 1.13.6.1
 ENV OPENRESTY_PREFIX /opt/openresty
 ENV NGINX_PREFIX /opt/openresty/nginx
 ENV VAR_PREFIX /opt/openresty/nginx/var
@@ -114,6 +113,6 @@ ONBUILD COPY nginx $NGINX_PREFIX/
 RUN  mkdir -p /etc/nginx/ssl && echo '<?php if(isset($_REQUEST["printinfo"])) phpinfo();' > /var/www/html/index.php
 ADD  ./start.sh /start.sh
 
-EXPOSE 80 443 9000
+EXPOSE 80 9000
 
 ENTRYPOINT ["/start.sh",""]
