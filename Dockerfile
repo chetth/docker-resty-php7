@@ -110,7 +110,9 @@ WORKDIR $NGINX_PREFIX/
 ONBUILD RUN rm -rf conf/* html/*
 ONBUILD COPY nginx $NGINX_PREFIX/
 
-RUN  mkdir -p /etc/nginx/ssl && echo '<?php if(isset($_REQUEST["printinfo"])) phpinfo();' > /var/www/html/index.php
+RUN  mkdir -p /etc/nginx/ssl \
+ && echo '<?php if(isset($_REQUEST["printinfo"])) phpinfo();' > /var/www/html/index.php \
+ && echo '?><a href=/?printinfo>see phpinfo()</a>' >> /var/www/html/index.php 
 ADD  ./start.sh /start.sh
 RUN chmod +x /start.sh
 
