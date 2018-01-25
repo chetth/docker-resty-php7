@@ -112,6 +112,7 @@ ONBUILD COPY nginx $NGINX_PREFIX/
 
 RUN  mkdir -p /etc/nginx/ssl && echo '<?php if(isset($_REQUEST["printinfo"])) phpinfo();' > /var/www/html/index.php
 ADD  ./start.sh /start.sh
+RUN chmod +x /start.sh
 
 EXPOSE 80 9000
 
