@@ -34,7 +34,7 @@ RUN \
     docker-php-source delete
 
 ####  Setup OpenResty ###################
-ENV OPENRESTY_VERSION 1.13.6.1
+ENV OPENRESTY_VERSION 1.15.8.2
 ENV OPENRESTY_PREFIX /opt/openresty
 ENV NGINX_PREFIX /opt/openresty/nginx
 ENV VAR_PREFIX /opt/openresty/nginx/var
@@ -43,12 +43,12 @@ ENV VAR_LOG_PREFIX /opt/openresty/nginx/logs
 # NginX prefix is automatically set by OpenResty to $OPENRESTY_PREFIX/nginx
 # look for $ngx_prefix in https://github.com/openresty/ngx_openresty/blob/master/util/configure
 
-# Timezone
-ENV TIMEZONE Asia/Bangkok
-RUN echo "Install Timezone ===========>>" \
- && apk add --update tzdata \
- && cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
- && echo "${TIMEZONE}" > /etc/timezone
+## Timezone
+#ENV TIMEZONE Asia/Bangkok
+#RUN echo "Install Timezone ===========>>" \
+# && apk add --update tzdata \
+# && cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
+# && echo "${TIMEZONE}" > /etc/timezone
 
 RUN echo "==> Installing dependencies..." \
  && apk update \
