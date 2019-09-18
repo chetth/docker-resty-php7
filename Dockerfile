@@ -99,7 +99,7 @@ RUN echo "==> Installing dependencies..." \
  && ln -sf $OPENRESTY_PREFIX/luajit/bin/luajit-* $OPENRESTY_PREFIX/luajit/bin/lua \
  && ln -sf $OPENRESTY_PREFIX/luajit/bin/luajit-* /usr/local/bin/lua \
  && apk del build-deps tzdata \
- && apk add libpcrecpp libpcre16 libpcre32 openssl libssl1.0 pcre libgcc libstdc++ libuuid curl \
+ && apk add libpcrecpp libpcre16 libpcre32 openssl libssl1.1 pcre libgcc libstdc++ libuuid curl \
  && rm -rf /var/cache/apk/* \
  && rm -rf /root/ngx_openresty \
  && rm -f $NGINX_PREFIX/conf/*.default \
