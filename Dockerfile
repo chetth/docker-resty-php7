@@ -17,9 +17,7 @@ RUN \
     docker-php-ext-configure pdo_mysql && \
     docker-php-ext-configure opcache && \
     docker-php-ext-configure exif && \
-    docker-php-ext-configure gd \
-    --with-jpeg-dir=/usr/include --with-png-dir=/usr/include \
-    --with-webp-dir=/usr/include --with-freetype-dir=/usr/include && \
+    docker-php-ext-configure gd && \
     docker-php-ext-configure sockets && \
     docker-php-ext-install pdo_mysql opcache exif gd sockets mysqli
 
