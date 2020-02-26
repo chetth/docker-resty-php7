@@ -13,11 +13,6 @@ http {
 	include       mime.types;
 	default_type  application/octet-stream;
 
-	client_body_buffer_size      10K;
-	client_header_buffer_size     1k;
-	client_max_body_size           0;
-	large_client_header_buffers 2 1k;
-
 	log_format  main  '\$remote_addr - \$remote_user [\$time_local] "\$request" '
 	'\$status \$body_bytes_sent "\$http_referer" '
 	'"\$http_user_agent" "\$http_x_forwarded_for"';
@@ -28,7 +23,20 @@ http {
 	keepalive_timeout   120;
 	lua_package_path    "/opt/openresty/lualib/?.lua;;";
 
-	gzip                 on;
+        gzip  on;
+        gzip_types        image/gif text/plain text/css image/x-icon application/x-perl application/x-httpd-cgi application/x-javascript text/javascript image/png image/x-ms-bmp application/x-font-ttf application/vnd.ms-fontobject  application/font-woff font/opentype font/ttf;
+        gzip_vary         on;
+
+        large_client_header_buffers 8 1024k;
+        client_header_buffer_size 1024k;
+        client_max_body_size 0;
+        client_body_buffer_size 128k;
+        proxy_headers_hash_max_size 512;
+        proxy_headers_hash_bucket_size 256;
+        server_names_hash_bucket_size 64;
+        proxy_buffers 4 256k;
+        proxy_buffer_size 128k;
+        proxy_busy_buffers_size 256k;
 
 	server {
 		listen 80 default_server;
@@ -70,8 +78,7 @@ http {
 		include /opt/openresty/nginx/conf/conf.d/*.conf;
 	}
 
-
-	include /opt/openresty/nginx/conf/site/*;
+        include /opt/openresty/nginx/conf/site/*.conf;
 }
 EOF
 /opt/openresty/nginx/sbin/nginx
