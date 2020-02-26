@@ -1,4 +1,8 @@
-FROM php:fpm-alpine
+#### select your prefer PHP version
+#FROM php:7.4-fpm-alpine
+FROM php:7.3-fpm-alpine
+#FROM php:7.2-fpm-alpine
+#FROM php:7.1-fpm-alpine
 
 #### PHP7 extensions ##############################
 RUN apk add --update --no-cache --virtual .ext-deps \
