@@ -1,6 +1,6 @@
 #### select your prefer PHP version
-#FROM php:7.4-fpm-alpine
-FROM php:7.3-fpm-alpine
+FROM php:7.4-fpm-alpine
+#FROM php:7.3-fpm-alpine
 #FROM php:7.2-fpm-alpine
 #FROM php:7.1-fpm-alpine
 
