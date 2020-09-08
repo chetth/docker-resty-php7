@@ -39,11 +39,11 @@ RUN \
 
 ####  Setup OpenResty ###################
 ENV OPENRESTY_VERSION 1.15.8.3
-ENV OPENRESTY_PREFIX /opt/kapook
-ENV NGINX_PREFIX /opt/kapook/nginx
-ENV NGINX_CONF /opt/kapook/nginx/conf
-ENV VAR_PREFIX /opt/kapook/nginx/var
-ENV VAR_LOG_PREFIX /opt/kapook/nginx/logs
+ENV OPENRESTY_PREFIX /opt/openresty
+ENV NGINX_PREFIX /opt/openresty/nginx
+ENV NGINX_CONF /opt/openresty/nginx/conf
+ENV VAR_PREFIX /opt/openresty/nginx/var
+ENV VAR_LOG_PREFIX /opt/openresty/nginx/logs
 
 # NginX prefix is automatically set by OpenResty to $OPENRESTY_PREFIX/nginx
 # look for $ngx_prefix in https://github.com/openresty/ngx_openresty/blob/master/util/configure
