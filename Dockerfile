@@ -1,59 +1,59 @@
-#### select your prefer PHP version
-#FROM php:7.4-fpm-alpine
-FROM php:7.3-fpm-alpine
-#FROM php:7.2-fpm-alpine
-#FROM php:7.1-fpm-alpine
+FROM php:7.4-fpm-alpine
 
 #### PHP7 extensions ##############################
 RUN apk add --update --no-cache --virtual .ext-deps \
-    libjpeg-turbo-dev \
-    libwebp-dev \
-    libpng-dev \
-    freetype-dev \
-    libmcrypt-dev \
-    autoconf \
-    g++ \
-    make \
-    openssl-dev \
-    pcre-dev \
-    pcre-tools pcre \
-    libmemcached \
-    zlib \
-    cyrus-sasl \
-    libmemcached-dev \
-    zlib-dev \
-    cyrus-sasl-dev && \
+        libjpeg-turbo-dev \
+        libwebp-dev \
+        libpng-dev \
+        freetype-dev \
+        libmcrypt-dev \
+        autoconf \
+        g++ \
+        make \
+        openssl-dev pcre-dev pcre-tools pcre \
+        libmemcached zlib cyrus-sasl libmemcached-dev zlib-dev cyrus-sasl-dev \
+        libzip-dev imagemagick-dev php7-pecl-imagick-dev \
+        libjpeg-turbo-dev libjpeg libjpeg-turbo
+
+RUN \
     docker-php-ext-configure pdo_mysql && \
     docker-php-ext-configure opcache && \
     docker-php-ext-configure exif && \
-    docker-php-ext-configure gd && \
+    docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-configure sockets && \
-    docker-php-ext-install pdo_mysql opcache exif gd sockets mysqli && \
+    docker-php-ext-install pdo_mysql opcache exif gd sockets mysqli calendar
+
+RUN \
     pecl install redis && \
     pecl install mongodb && \
     pecl install memcached && \
+    pecl install imagick && \
+    pecl install zip && \
     pecl clear-cache && \
     docker-php-ext-enable redis.so && \
     docker-php-ext-enable mongodb.so && \
     docker-php-ext-enable memcached.so && \
+    docker-php-ext-enable imagick.so && \
+    docker-php-ext-enable zip.so && \
     docker-php-source delete
 
 ####  Setup OpenResty ###################
-ENV OPENRESTY_VERSION 1.15.8.2
-ENV OPENRESTY_PREFIX /opt/openresty
-ENV NGINX_PREFIX /opt/openresty/nginx
-ENV VAR_PREFIX /opt/openresty/nginx/var
-ENV VAR_LOG_PREFIX /opt/openresty/nginx/logs
+ENV OPENRESTY_VERSION 1.15.8.3
+ENV OPENRESTY_PREFIX /opt/kapook
+ENV NGINX_PREFIX /opt/kapook/nginx
+ENV NGINX_CONF /opt/kapook/nginx/conf
+ENV VAR_PREFIX /opt/kapook/nginx/var
+ENV VAR_LOG_PREFIX /opt/kapook/nginx/logs
 
 # NginX prefix is automatically set by OpenResty to $OPENRESTY_PREFIX/nginx
 # look for $ngx_prefix in https://github.com/openresty/ngx_openresty/blob/master/util/configure
 
-## Timezone
-#ENV TIMEZONE Asia/Bangkok
-#RUN echo "Install Timezone ===========>>" \
-# && apk add --update tzdata \
-# && cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
-# && echo "${TIMEZONE}" > /etc/timezone
+# Timezone
+ENV TIMEZONE Asia/Bangkok
+RUN echo "Install Timezone ===========>>" \
+ && apk add --update tzdata \
+ && cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
+ && echo "${TIMEZONE}" > /etc/timezone
 
 RUN echo "==> Installing dependencies..." \
  && apk update \
@@ -104,13 +104,14 @@ RUN echo "==> Installing dependencies..." \
  && ln -sf $OPENRESTY_PREFIX/luajit/bin/luajit-* $OPENRESTY_PREFIX/luajit/bin/lua \
  && ln -sf $OPENRESTY_PREFIX/luajit/bin/luajit-* /usr/local/bin/lua \
  && apk del build-deps tzdata \
- && apk add libpcrecpp libpcre16 libpcre32 openssl libssl1.1 pcre libgcc libstdc++ libuuid curl \
+ && apk update && apk upgrade \
+ && apk add libpcrecpp libpcre16 libpcre32 openssl libssl1.1 pcre libgcc libstdc++ libuuid curl imagemagick ghostscript \
  && rm -rf /var/cache/apk/* \
  && rm -rf /root/ngx_openresty \
  && rm -f $NGINX_PREFIX/conf/*.default \
  && mkdir -p /var/log/nginx
 
-WORKDIR $NGINX_PREFIX/
+WORKDIR $NGINX_CONF
 
 ONBUILD RUN rm -rf conf/* html/*
 ONBUILD COPY nginx $NGINX_PREFIX/
@@ -119,8 +120,9 @@ RUN  mkdir -p /etc/nginx/ssl \
  && echo '<?php if(isset($_REQUEST["printinfo"])) phpinfo();' > /var/www/html/index.php \
  && echo '?><a href=/?printinfo>see phpinfo()</a>' >> /var/www/html/index.php 
 ADD  ./start.sh /start.sh
+COPY ./nginx.conf ${NGINX_CONF}/nginx.conf
 RUN chmod +x /start.sh
 
-EXPOSE 80 9000
+EXPOSE 80
 
-ENTRYPOINT ["/start.sh",""]
+ENTRYPOINT ["/start.sh"]
