@@ -1,4 +1,4 @@
-FROM php:7.4-fpm-alpine
+FROM php:7.4-fpm-alpine3.13
 
 #### PHP7 extensions ##############################
 RUN apk add --update --no-cache --virtual .ext-deps \
@@ -13,7 +13,8 @@ RUN apk add --update --no-cache --virtual .ext-deps \
         openssl-dev pcre-dev pcre-tools pcre \
         libmemcached zlib cyrus-sasl libmemcached-dev zlib-dev cyrus-sasl-dev \
         libzip-dev imagemagick-dev php7-pecl-imagick-dev \
-        libjpeg-turbo-dev libjpeg libjpeg-turbo
+        libjpeg-turbo-dev libjpeg libjpeg-turbo \
+        icu-dev
 
 RUN \
     docker-php-ext-configure pdo_mysql && \
@@ -21,7 +22,8 @@ RUN \
     docker-php-ext-configure exif && \
     docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-configure sockets && \
-    docker-php-ext-install pdo_mysql opcache exif gd sockets mysqli calendar
+    docker-php-ext-configure intl && \
+    docker-php-ext-install pdo_mysql opcache exif gd sockets mysqli calendar intl
 
 RUN \
     pecl install redis && \
@@ -35,10 +37,11 @@ RUN \
     docker-php-ext-enable memcached.so && \
     docker-php-ext-enable imagick.so && \
     docker-php-ext-enable zip.so && \
+    docker-php-ext-enable intl && \
     docker-php-source delete
 
 ####  Setup OpenResty ###################
-ENV OPENRESTY_VERSION 1.15.8.3
+ENV OPENRESTY_VERSION 1.19.9.1
 ENV OPENRESTY_PREFIX /opt/openresty
 ENV NGINX_PREFIX /opt/openresty/nginx
 ENV NGINX_CONF /opt/openresty/nginx/conf
@@ -60,7 +63,7 @@ RUN echo "==> Installing dependencies..." \
  && apk add --virtual build-deps \
     make gcc musl-dev \
     pcre-dev openssl-dev zlib-dev ncurses-dev readline-dev \
-    curl perl \
+    curl perl wget \
  && mkdir -p /root/ngx_openresty \
  && cd /root/ngx_openresty \
  && echo "==> Downloading OpenResty..." \
@@ -109,15 +112,17 @@ RUN echo "==> Installing dependencies..." \
  && rm -rf /var/cache/apk/* \
  && rm -rf /root/ngx_openresty \
  && rm -f $NGINX_PREFIX/conf/*.default \
- && mkdir -p /var/log/nginx
+ && mkdir -p /var/log/nginx \
+ && cd /var/tmp && wget -qO composer-setup.php https://getcomposer.org/installer \
+ && php composer-setup.php --filename=composer && chmod +x composer \
+ && mv -v composer /usr/local/bin/composer && rm -f composer-setup.php
 
 WORKDIR $NGINX_CONF
 
 ONBUILD RUN rm -rf conf/* html/*
 ONBUILD COPY nginx $NGINX_PREFIX/
 
-RUN  mkdir -p /etc/nginx/ssl \
- && echo '<?php if(isset($_REQUEST["printinfo"])) phpinfo();' > /var/www/html/index.php \
+RUN echo '<?php if(isset($_REQUEST["printinfo"])) phpinfo();' > /var/www/html/index.php \
  && echo '?><a href=/?printinfo>see phpinfo()</a>' >> /var/www/html/index.php 
 ADD  ./start.sh /start.sh
 COPY ./nginx.conf ${NGINX_CONF}/nginx.conf
@@ -125,4 +130,4 @@ RUN chmod +x /start.sh
 
 EXPOSE 80
 
-ENTRYPOINT ["/start.sh"]
+ENTRYPOINT ["/start.sh",""]
