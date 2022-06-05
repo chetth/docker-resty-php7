@@ -41,7 +41,7 @@ RUN \
     docker-php-source delete
 
 ####  Setup OpenResty ###################
-ENV OPENRESTY_VERSION 1.19.9.1
+ENV OPENRESTY_VERSION 1.21.4.1
 ENV OPENRESTY_PREFIX /opt/openresty
 ENV NGINX_PREFIX /opt/openresty/nginx
 ENV NGINX_CONF /opt/openresty/nginx/conf
